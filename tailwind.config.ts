@@ -33,6 +33,7 @@ const customTextPlugin = plugin(({ addUtilities }) => {
       newUtilities[className] = {
         fontSize: `var(${sizeVar})`,
         lineHeight: `var(${sizeVar}--line-height)`,
+        letterSpacing: `var(${sizeVar}--letter-spacing)`,
         fontWeight: `var(${weightVar})`,
       };
     }
