@@ -10,9 +10,9 @@ import {
   Shuffle, 
   Repeat, 
   Volume2,
-  Music,
   Loader2
 } from 'lucide-react';
+import Image from 'next/image';
 
 type PlayerState = 'playing' | 'paused' | 'loading';
 
@@ -245,17 +245,18 @@ const MusicPlayer = () => {
                 variants={albumVariants}
                 animate={playerState}
               >
-                <img
+                <Image
                   src="/AlbumArt.png"
                   alt="Album Art"
-                  className="absolute"
                   style={{
+                    position: 'absolute',
                     top: '30px',
                     left: '36px',
-                    width: '48px',
-                    height: '48px',
                     objectFit: 'contain'
                   }}
+                  width={48}
+                  height={48}
+                  priority
                 />
               </motion.div>
               {/* Right side - Song Details */}
@@ -420,7 +421,13 @@ const MusicPlayer = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <Loader2 size={24} className="text-white animate-spin" />
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <Loader2 size={24} className="text-white animate-spin" />
+                    </motion.div>
                   </motion.div>
                 ) : playerState === 'playing' ? (
                   <motion.div
