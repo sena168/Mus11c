@@ -117,10 +117,26 @@ const MusicPlayer = () => {
 
   // Handle next/prev/loop
   const handleNext = () => {
-    setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+    if (playerState === 'playing') {
+      setPlayerState('loading');
+      setTimeout(() => {
+        setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+        setPlayerState('playing');
+      }, 500);
+    } else {
+      setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+    }
   };
   const handlePrev = () => {
-    setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
+    if (playerState === 'playing') {
+      setPlayerState('loading');
+      setTimeout(() => {
+        setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
+        setPlayerState('playing');
+      }, 500);
+    } else {
+      setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
+    }
   };
   const handleLoopToggle = () => {
     setLoop((prev) => !prev);
@@ -256,6 +272,15 @@ const MusicPlayer = () => {
       transition: { duration: 0.3 }
     }
   };
+
+  // When currentTrackIndex changes and playerState is playing, always play the new track
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playerState === 'playing') {
+      audio.play();
+    }
+  }, [currentTrackIndex, playerState]);
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
