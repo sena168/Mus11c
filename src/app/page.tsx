@@ -9,6 +9,7 @@ import {
   SkipForward, 
   Shuffle, 
   Repeat, 
+  Repeat1,
   Volume2,
   Loader2
 } from 'lucide-react';
@@ -24,7 +25,7 @@ const MusicPlayer = () => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [isVolumeHover, setIsVolumeHover] = useState(false);
-  const [loop, setLoop] = useState(false);
+  const [loopMode, setLoopMode] = useState<'off' | 'all' | 'one'>('off');
 
   // All bars have the same max height
   const barCount = 5;
@@ -139,7 +140,7 @@ const MusicPlayer = () => {
     }
   };
   const handleLoopToggle = () => {
-    setLoop((prev) => !prev);
+    setLoopMode((prev) => prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off');
   };
 
   // Auto-advance or loop on track end
@@ -147,18 +148,30 @@ const MusicPlayer = () => {
     const audio = audioRef.current;
     if (!audio) return;
     const handleEnded = () => {
-      if (loop) {
+      if (loopMode === 'one') {
         audio.currentTime = 0;
         audio.play();
+      } else if (loopMode === 'all') {
+        if (currentTrackIndex === tracks.length - 1) {
+          setCurrentTrackIndex(0);
+          setPlayerState('playing');
+        } else {
+          handleNext();
+        }
       } else {
-        handleNext();
+        // loopMode === 'off'
+        if (currentTrackIndex < tracks.length - 1) {
+          handleNext();
+        } else {
+          setPlayerState('paused');
+        }
       }
     };
     audio.addEventListener('ended', handleEnded);
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [loop, tracks.length]);
+  }, [loopMode, tracks.length, currentTrackIndex, playerState]);
 
   // Container animation variants
   const containerVariants: Variants = {
@@ -549,11 +562,11 @@ const MusicPlayer = () => {
             <motion.button
               className="flex items-center justify-center"
               style={{ 
-                color: loop ? '#8b5cf6' : '#717680',
+                color: loopMode !== 'off' ? '#8b5cf6' : '#717680',
                 borderRadius: '8px',
                 padding: '8px',
-                backgroundColor: loop ? 'rgba(139,92,246,0.1)' : 'transparent',
-                border: loop ? '1px solid #8b5cf6' : 'none'
+                backgroundColor: loopMode !== 'off' ? 'rgba(139,92,246,0.1)' : 'transparent',
+                border: loopMode !== 'off' ? '1px solid #8b5cf6' : 'none'
               }}
               whileHover={{ 
                 scale: 1.05,
@@ -565,8 +578,9 @@ const MusicPlayer = () => {
                 transition: { type: 'spring', stiffness: 400, damping: 25 }
               }}
               onClick={handleLoopToggle}
+              title={loopMode === 'off' ? 'Loop Off' : loopMode === 'all' ? 'Loop All' : 'Loop One'}
             >
-              <Repeat size={20} />
+              {loopMode === 'one' ? <Repeat1 size={20} /> : <Repeat size={20} />}
             </motion.button>
           </div>
 
