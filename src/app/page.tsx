@@ -23,6 +23,8 @@ const MusicPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isVolumeHover, setIsVolumeHover] = useState(false);
+  const [loop, setLoop] = useState(false);
 
   // All bars have the same max height
   const barCount = 5;
@@ -30,6 +32,23 @@ const MusicPlayer = () => {
   const minBarHeight = maxBarHeight * 0.2; // 6.4px
 
   const volumeBarRef = useRef<HTMLDivElement>(null);
+
+  // Track list with placeholder data
+  const tracks = [
+    { id: 1, src: '/music/Tersirat di Balik Senyuman - Brunetta Gondola.mp3', title: 'Tersirat di Balik Senyuman', artist: 'Brunetta Gondola' },
+    { id: 2, src: '/music/ポモドーロ・ラブ - 真道もも (Pomodoro LOVE! - Mado Momo) - HMS.mp3', title: 'ポモドーロ・ラブ - 真道もも (Pomodoro LOVE! - Mado Momo)', artist: '真道もも (Mado Momo)' },
+    { id: 3, src: '/music/Nur Wenn Ich Will (AI-Prinz) - HMS.mp3', title: 'Nur Wenn Ich Will (AI-Prinz)', artist: 'HMS' },
+    { id: 4, src: '/music/🔥 _I Am the Dream Dreaming Me_ - HMS.mp3', title: '🔥 _I Am the Dream Dreaming Me_ ', artist: 'HMS' },
+    { id: 5, src: '/music/「冬の神話 (Fuyu no Shinwa) — Winter Myth」 - HMS.mp3', title: '「冬の神話 (Fuyu no Shinwa) — Winter Myth」', artist: 'HMS' },
+{ id: 6, src: '/music/A Morning Hum - HMS.mp3', title: 'A Morning Hum', artist: 'HMS' },
+{ id: 7, src: '/music/🌸 花の香りに (Hana no Kaori ni) 🌸 Glam Rock Live.mp3', title: '🌸 花の香りに (Hana no Kaori ni) 🌸 Glam Rock Live', artist: '差乃間・ミッチ' },
+{ id: 8, src: '/music/A Morning Hum (Remix) - HMS.mp3', title: 'A Morning Hum (Remix)', artist: 'HMS' },
+{ id: 9, src: '/music/🌸 花の香りに (Hana no Kaori ni) 🌸 - 花野かおり.mp3', title: '🌸 花の香りに (Hana no Kaori ni) 🌸', artist: '花野かおり' },
+{ id: 10, src: '/music/Debugin Hidup - HMS.mp3', title: 'Debugin Hidup', artist: 'HMS' },
+];
+
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const currentTrack = tracks[currentTrackIndex];
 
   // Simulate loading delay when changing states
   const handlePlayPause = () => {
@@ -95,6 +114,35 @@ const MusicPlayer = () => {
     audio.volume = percent;
     setVolume(percent * 100);
   };
+
+  // Handle next/prev/loop
+  const handleNext = () => {
+    setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+  };
+  const handlePrev = () => {
+    setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
+  };
+  const handleLoopToggle = () => {
+    setLoop((prev) => !prev);
+  };
+
+  // Auto-advance or loop on track end
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const handleEnded = () => {
+      if (loop) {
+        audio.currentTime = 0;
+        audio.play();
+      } else {
+        handleNext();
+      }
+    };
+    audio.addEventListener('ended', handleEnded);
+    return () => {
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [loop, tracks.length]);
 
   // Container animation variants
   const containerVariants: Variants = {
@@ -214,7 +262,7 @@ const MusicPlayer = () => {
       {/* Hidden audio element */}
       <audio
         ref={audioRef}
-        src={encodeURI('/music/ポモドーロ・ラブ - 真道もも (Pomodoro LOVE! - Mado Momo) - HMS.mp3')}
+        src={currentTrack.src}
         preload="auto"
       />
       <motion.div
@@ -268,7 +316,7 @@ const MusicPlayer = () => {
                       color: '#f5f5f5'
                     }}
                   >
-                    Awesome Song Title
+                    {currentTrack.title}
                   </h1>
                   <p 
                     className="text-sm-regular"
@@ -276,7 +324,7 @@ const MusicPlayer = () => {
                       color: '#a4a7ae'
                     }}
                   >
-                    Amazing Artist
+                    {currentTrack.artist}
                   </p>
                 </div>
               </div>
@@ -389,6 +437,7 @@ const MusicPlayer = () => {
                 scale: 0.95,
                 transition: { type: 'spring', stiffness: 400, damping: 25 }
               }}
+              onClick={handlePrev}
             >
               <SkipBack size={20} />
             </motion.button>
@@ -467,6 +516,7 @@ const MusicPlayer = () => {
                 scale: 0.95,
                 transition: { type: 'spring', stiffness: 400, damping: 25 }
               }}
+              onClick={handleNext}
             >
               <SkipForward size={20} />
             </motion.button>
@@ -474,9 +524,11 @@ const MusicPlayer = () => {
             <motion.button
               className="flex items-center justify-center"
               style={{ 
-                color: '#717680',
+                color: loop ? '#8b5cf6' : '#717680',
                 borderRadius: '8px',
-                padding: '8px'
+                padding: '8px',
+                backgroundColor: loop ? 'rgba(139,92,246,0.1)' : 'transparent',
+                border: loop ? '1px solid #8b5cf6' : 'none'
               }}
               whileHover={{ 
                 scale: 1.05,
@@ -487,6 +539,7 @@ const MusicPlayer = () => {
                 scale: 0.95,
                 transition: { type: 'spring', stiffness: 400, damping: 25 }
               }}
+              onClick={handleLoopToggle}
             >
               <Repeat size={20} />
             </motion.button>
@@ -503,15 +556,17 @@ const MusicPlayer = () => {
                 backgroundColor: '#252b37'
               }}
               onClick={handleVolume}
+              onMouseEnter={() => setIsVolumeHover(true)}
+              onMouseLeave={() => setIsVolumeHover(false)}
             >
               <motion.div
                 className="absolute top-0 left-0 h-full"
                 style={{
                   width: `${volume}%`,
-                  backgroundColor: '#717680',
+                  backgroundColor: isVolumeHover ? '#8b5cf6' : '#717680',
                   borderRadius: '9999px 0px 0px 9999px'
                 }}
-                whileHover={{ backgroundColor: '#8b5cf6' }}
+                animate={{ backgroundColor: isVolumeHover ? '#8b5cf6' : '#717680' }}
                 transition={{ duration: 0.2 }}
               />
             </div>
