@@ -11,6 +11,7 @@ import {
   Repeat, 
   Repeat1,
   Volume2,
+  VolumeX,
   Loader2
 } from 'lucide-react';
 import Image from 'next/image';
@@ -26,6 +27,8 @@ const MusicPlayer = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isVolumeHover, setIsVolumeHover] = useState(false);
   const [loopMode, setLoopMode] = useState<'off' | 'all' | 'one'>('off');
+  const [shuffle, setShuffle] = useState(false);
+  const [muted, setMuted] = useState(false);
 
   // All bars have the same max height
   const barCount = 5;
@@ -142,6 +145,9 @@ const MusicPlayer = () => {
   const handleLoopToggle = () => {
     setLoopMode((prev) => prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off');
   };
+  const handleShuffleToggle = () => {
+    setShuffle((prev) => !prev);
+  };
 
   // Auto-advance or loop on track end
   useEffect(() => {
@@ -151,6 +157,14 @@ const MusicPlayer = () => {
       if (loopMode === 'one') {
         audio.currentTime = 0;
         audio.play();
+      } else if (shuffle) {
+        // Pick a random track (not the current one)
+        let nextIndex = currentTrackIndex;
+        while (tracks.length > 1 && nextIndex === currentTrackIndex) {
+          nextIndex = Math.floor(Math.random() * tracks.length);
+        }
+        setCurrentTrackIndex(nextIndex);
+        setPlayerState('playing');
       } else if (loopMode === 'all') {
         if (currentTrackIndex === tracks.length - 1) {
           setCurrentTrackIndex(0);
@@ -171,7 +185,13 @@ const MusicPlayer = () => {
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [loopMode, tracks.length, currentTrackIndex, playerState]);
+  }, [loopMode, shuffle, tracks.length, currentTrackIndex, playerState]);
+
+  // Sync audio.muted with state
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) audio.muted = muted;
+  }, [muted]);
 
   // Container animation variants
   const containerVariants: Variants = {
@@ -442,9 +462,11 @@ const MusicPlayer = () => {
             <motion.button
               className="flex items-center justify-center"
               style={{ 
-                color: '#717680',
+                color: shuffle ? '#8b5cf6' : '#717680',
                 borderRadius: '8px',
-                padding: '8px'
+                padding: '8px',
+                backgroundColor: shuffle ? 'rgba(139,92,246,0.1)' : 'transparent',
+                border: shuffle ? '1px solid #8b5cf6' : 'none'
               }}
               whileHover={{ 
                 scale: 1.05,
@@ -455,6 +477,8 @@ const MusicPlayer = () => {
                 scale: 0.95,
                 transition: { type: 'spring', stiffness: 400, damping: 25 }
               }}
+              onClick={handleShuffleToggle}
+              title={shuffle ? 'Shuffle On' : 'Shuffle Off'}
             >
               <Shuffle size={20} />
             </motion.button>
@@ -586,7 +610,24 @@ const MusicPlayer = () => {
 
           {/* Volume Control */}
           <div className="flex items-center gap-2" style={{ marginTop: '16px' }}>
-            <Volume2 size={16} style={{ color: '#717680' }} />
+            <button
+              onClick={() => setMuted((m) => !m)}
+              style={{
+                color: muted ? '#8b5cf6' : '#717680',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                outline: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 0
+              }}
+              title={muted ? 'Unmute' : 'Mute'}
+            >
+              {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </button>
             <div
               ref={volumeBarRef}
               className="flex-1 relative rounded-full overflow-hidden cursor-pointer"
