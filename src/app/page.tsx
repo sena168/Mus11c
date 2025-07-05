@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { 
   Play, 
@@ -147,10 +147,10 @@ const MusicPlayer = () => {
         document.removeEventListener('mouseup', handleVolumeMouseUp);
       };
     }
-  }, [isDraggingVolume]);
+  }, [isDraggingVolume, handleVolumeMouseMove, handleVolumeMouseUp]);
 
   // Handle next/prev/loop
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (playerState === 'playing') {
       setPlayerState('loading');
       setTimeout(() => {
@@ -160,7 +160,8 @@ const MusicPlayer = () => {
     } else {
       setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
     }
-  };
+  }, [playerState, tracks.length]);
+
   const handlePrev = () => {
     if (playerState === 'playing') {
       setPlayerState('loading');
@@ -215,7 +216,7 @@ const MusicPlayer = () => {
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [loopMode, shuffle, tracks.length, currentTrackIndex, playerState]);
+  }, [loopMode, shuffle, tracks.length, currentTrackIndex, playerState, handleNext]);
 
   // Sync audio.muted with state
   useEffect(() => {
@@ -354,11 +355,11 @@ const MusicPlayer = () => {
         preload="auto"
       />
       <motion.div
-        className="relative rounded-2xl w-full"
+        className="relative w-full rounded-2xl"
         style={{
-          maxWidth: '500px',
-          backgroundColor: '#0f0f0f',
-          padding: '16px'
+          maxWidth: 'clamp(320px, 90vw, 500px)',
+          padding: 'clamp(8px, 3vw, 24px)',
+          backgroundColor: '#0f0f0f'
         }}
         variants={containerVariants}
         animate={playerState}
@@ -366,16 +367,15 @@ const MusicPlayer = () => {
       >
         <div className="flex flex-col">
           {/* Song Info Section - Album Art + Text + Equalizer as a single block */}
-          <div className="flex flex-col" style={{paddingBottom: '20px'}}>
+          <div className="flex flex-col" style={{ paddingBottom: 'clamp(8px, 2vw, 24px)' }}>
             {/* Album Art + Song Details Row */}
-            <div className="flex items-center" style={{ gap: '24px' }}>
+            <div className="flex items-center" style={{ gap: 'clamp(8px, 4vw, 32px)' }}>
               {/* Album Artwork */}
               <motion.div
-                className="relative flex-shrink-0 overflow-hidden"
+                className="relative flex-shrink-0 overflow-hidden rounded-xl"
                 style={{
-                  width: '120px',
-                  height: '120px',
-                  borderRadius: '12px',
+                  width: 'clamp(56px, 24vw, 120px)',
+                  height: 'clamp(56px, 24vw, 120px)',
                   background: 'linear-gradient(127.48deg, #7c3aed, #db2777)'
                 }}
                 variants={albumVariants}
@@ -386,8 +386,10 @@ const MusicPlayer = () => {
                   alt="Album Art"
                   style={{
                     position: 'absolute',
-                    top: '30px',
-                    left: '36px',
+                    top: '25%',
+                    left: '30%',
+                    width: '40%',
+                    height: '40%',
                     objectFit: 'contain'
                   }}
                   width={48}
@@ -488,15 +490,16 @@ const MusicPlayer = () => {
           </div>
 
           {/* Control Buttons */}
-          <div className="flex items-center justify-center" style={{ gap: '16px', marginTop: '16px' }}>
+          <div className="flex items-center justify-center mt-4" style={{ gap: 'clamp(8px, 2vw, 16px)' }}>
+            {/* Shuffle Button */}
             <motion.button
-              className="flex items-center justify-center"
-              style={{ 
+              className="flex items-center justify-center rounded-md border transition-colors"
+              style={{
+                width: 'clamp(32px, 6vw, 40px)',
+                height: 'clamp(32px, 6vw, 40px)',
                 color: shuffle ? '#8b5cf6' : '#717680',
-                borderRadius: '8px',
-                padding: '8px',
                 backgroundColor: shuffle ? 'rgba(139,92,246,0.1)' : 'transparent',
-                border: shuffle ? '1px solid #8b5cf6' : 'none'
+                borderColor: shuffle ? '#8b5cf6' : 'transparent',
               }}
               whileHover={{ 
                 scale: 1.05,
@@ -510,15 +513,16 @@ const MusicPlayer = () => {
               onClick={handleShuffleToggle}
               title={shuffle ? 'Shuffle On' : 'Shuffle Off'}
             >
-              <Shuffle size={20} />
+              <Shuffle style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} />
             </motion.button>
 
+            {/* Previous Button */}
             <motion.button
-              className="flex items-center justify-center"
-              style={{ 
+              className="flex items-center justify-center rounded-md border border-transparent transition-colors"
+              style={{
+                width: 'clamp(32px, 6vw, 40px)',
+                height: 'clamp(32px, 6vw, 40px)',
                 color: '#717680',
-                borderRadius: '8px',
-                padding: '8px'
               }}
               whileHover={{ 
                 scale: 1.05,
@@ -531,15 +535,15 @@ const MusicPlayer = () => {
               }}
               onClick={handlePrev}
             >
-              <SkipBack size={20} />
+              <SkipBack style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} />
             </motion.button>
 
             {/* Play/Pause Button */}
             <motion.button
-              className="rounded-full flex items-center justify-center"
+              className="rounded-full flex items-center justify-center border-2 border-transparent transition-colors"
               style={{
-                width: '56px',
-                height: '56px'
+                width: 'clamp(40px, 8vw, 56px)',
+                height: 'clamp(40px, 8vw, 56px)',
               }}
               variants={playButtonVariants}
               animate={playerState}
@@ -567,7 +571,7 @@ const MusicPlayer = () => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                     >
-                      <Loader2 size={24} className="text-white animate-spin" />
+                      <Loader2 style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} className="text-white animate-spin" />
                     </motion.div>
                   </motion.div>
                 ) : playerState === 'playing' ? (
@@ -577,7 +581,7 @@ const MusicPlayer = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <Pause size={24} className="text-white" />
+                    <Pause className="text-white" style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -586,18 +590,19 @@ const MusicPlayer = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <Play size={24} className="text-white" style={{ marginLeft: '2px' }} />
+                    <Play className="text-white" style={{ marginLeft: '2px', width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} />
                   </motion.div>
                 )}
               </AnimatePresence>
             </motion.button>
 
+            {/* Next Button */}
             <motion.button
-              className="flex items-center justify-center"
-              style={{ 
+              className="flex items-center justify-center rounded-md border border-transparent transition-colors"
+              style={{
+                width: 'clamp(32px, 6vw, 40px)',
+                height: 'clamp(32px, 6vw, 40px)',
                 color: '#717680',
-                borderRadius: '8px',
-                padding: '8px'
               }}
               whileHover={{ 
                 scale: 1.05,
@@ -610,17 +615,18 @@ const MusicPlayer = () => {
               }}
               onClick={handleNext}
             >
-              <SkipForward size={20} />
+              <SkipForward style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} />
             </motion.button>
 
+            {/* Repeat Button */}
             <motion.button
-              className="flex items-center justify-center"
-              style={{ 
+              className="flex items-center justify-center rounded-md border transition-colors"
+              style={{
+                width: 'clamp(32px, 6vw, 40px)',
+                height: 'clamp(32px, 6vw, 40px)',
                 color: loopMode !== 'off' ? '#8b5cf6' : '#717680',
-                borderRadius: '8px',
-                padding: '8px',
                 backgroundColor: loopMode !== 'off' ? 'rgba(139,92,246,0.1)' : 'transparent',
-                border: loopMode !== 'off' ? '1px solid #8b5cf6' : 'none'
+                borderColor: loopMode !== 'off' ? '#8b5cf6' : 'transparent',
               }}
               whileHover={{ 
                 scale: 1.05,
@@ -634,7 +640,7 @@ const MusicPlayer = () => {
               onClick={handleLoopToggle}
               title={loopMode === 'off' ? 'Loop Off' : loopMode === 'all' ? 'Loop All' : 'Loop One'}
             >
-              {loopMode === 'one' ? <Repeat1 size={20} /> : <Repeat size={20} />}
+              {loopMode === 'one' ? <Repeat1 style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} /> : <Repeat style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }} />}
             </motion.button>
           </div>
 
