@@ -29,6 +29,7 @@ const MusicPlayer = () => {
   const [loopMode, setLoopMode] = useState<'off' | 'all' | 'one'>('off');
   const [shuffle, setShuffle] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [isDraggingVolume, setIsDraggingVolume] = useState(false);
 
   // All bars have the same max height
   const barCount = 5;
@@ -107,7 +108,7 @@ const MusicPlayer = () => {
   };
 
   // Volume handler
-  const handleVolume = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleVolume = (e: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
     const audio = audioRef.current;
     const bar = volumeBarRef.current;
     if (!audio || !bar) return;
@@ -118,6 +119,35 @@ const MusicPlayer = () => {
     audio.volume = percent;
     setVolume(percent * 100);
   };
+
+  // Volume drag handlers
+  const handleVolumeMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingVolume(true);
+    handleVolume(e);
+  };
+
+  const handleVolumeMouseMove = (e: MouseEvent) => {
+    if (isDraggingVolume) {
+      handleVolume(e);
+    }
+  };
+
+  const handleVolumeMouseUp = () => {
+    setIsDraggingVolume(false);
+  };
+
+  // Add/remove global mouse event listeners
+  useEffect(() => {
+    if (isDraggingVolume) {
+      document.addEventListener('mousemove', handleVolumeMouseMove);
+      document.addEventListener('mouseup', handleVolumeMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleVolumeMouseMove);
+        document.removeEventListener('mouseup', handleVolumeMouseUp);
+      };
+    }
+  }, [isDraggingVolume]);
 
   // Handle next/prev/loop
   const handleNext = () => {
@@ -636,6 +666,7 @@ const MusicPlayer = () => {
                 backgroundColor: '#252b37'
               }}
               onClick={handleVolume}
+              onMouseDown={handleVolumeMouseDown}
               onMouseEnter={() => setIsVolumeHover(true)}
               onMouseLeave={() => setIsVolumeHover(false)}
             >
