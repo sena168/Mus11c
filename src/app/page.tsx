@@ -18,9 +18,26 @@ import Image from 'next/image';
 
 type PlayerState = 'playing' | 'paused' | 'loading';
 
+// Define the structure of a track loaded from JSON
+interface Track {
+  id: number;
+  title: string;
+  artist: string;
+  filename: string;
+  src?: string; // src will be constructed dynamically
+}
+
+const loadingMessages = [
+  "Summoning the beats from the ether...",
+  "Polishing the audio, one pixel at a time...",
+  "Just a moment, the hamsters are spinning the wheel!",
+  "Buffering, like my brain on Monday mornings...",
+  "Preparing your auditory adventure!",
+];
+
 const MusicPlayer = () => {
   const [playerState, setPlayerState] = useState<PlayerState>('paused');
-  const [progress, setProgress] = useState(30); // 30% progress
+  const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(75); // 75% volume
   const audioRef = useRef<HTMLAudioElement>(null);
   const [duration, setDuration] = useState(0);
@@ -30,6 +47,39 @@ const MusicPlayer = () => {
   const [shuffle, setShuffle] = useState(false);
   const [muted, setMuted] = useState(false);
   const [isDraggingVolume, setIsDraggingVolume] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [songsPlayed, setSongsPlayed] = useState(0);
+  const [tracks, setTracks] = useState<Track[]>([]); // State to hold tracks from JSON
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Fetch tracks from JSON on component mount
+  useEffect(() => {
+    fetch('/tracks.json') // Assuming tracks.json is in your public directory
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data: Omit<Track, 'src'>[]) => {
+        // Construct the src URL using the custom domain
+        const loadedTracks = data.map(track => ({
+          ...track,
+          src: `https://music.kandelagyth.website/${encodeURIComponent(track.filename)}`
+        }));
+        setTracks(loadedTracks);
+      })
+      .catch(error => console.error("Could not fetch tracks:", error));
+  }, []);
+
+  useEffect(() => {
+    // Show a random toast on mount
+    const msg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+    setToastMessage(msg);
+    const timer = setTimeout(() => setToastMessage(null), 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // All bars have the same max height
   const barCount = 5;
@@ -38,27 +88,24 @@ const MusicPlayer = () => {
 
   const volumeBarRef = useRef<HTMLDivElement>(null);
 
-  // Track list with placeholder data
-  const tracks = [
-    { id: 1, src: '/music/Tersirat di Balik Senyuman - Brunetta Gondola.mp3', title: 'Tersirat di Balik Senyuman', artist: 'Brunetta Gondola' },
-    { id: 2, src: '/music/ポモドーロ・ラブ - 真道もも (Pomodoro LOVE! - Mado Momo) - HMS.mp3', title: 'ポモドーロ・ラブ - 真道もも (Pomodoro LOVE! - Mado Momo)', artist: '真道もも (Mado Momo)' },
-    { id: 3, src: '/music/Nur Wenn Ich Will (AI-Prinz) - HMS.mp3', title: 'Nur Wenn Ich Will (AI-Prinz)', artist: 'HMS' },
-    { id: 4, src: '/music/🔥 _I Am the Dream Dreaming Me_ - HMS.mp3', title: '🔥 _I Am the Dream Dreaming Me_ ', artist: 'HMS' },
-    { id: 5, src: '/music/「冬の神話 (Fuyu no Shinwa) — Winter Myth」 - HMS.mp3', title: '「冬の神話 (Fuyu no Shinwa) — Winter Myth」', artist: 'HMS' },
-{ id: 6, src: '/music/A Morning Hum - HMS.mp3', title: 'A Morning Hum', artist: 'HMS' },
-{ id: 7, src: '/music/🌸 花の香りに (Hana no Kaori ni) 🌸 Glam Rock Live.mp3', title: '🌸 花の香りに (Hana no Kaori ni) 🌸 Glam Rock Live', artist: '差乃間・ミッチ' },
-{ id: 8, src: '/music/A Morning Hum (Remix) - HMS.mp3', title: 'A Morning Hum (Remix)', artist: 'HMS' },
-{ id: 9, src: '/music/🌸 花の香りに (Hana no Kaori ni) 🌸 - 花野かおり.mp3', title: '🌸 花の香りに (Hana no Kaori ni) 🌸', artist: '花野かおり' },
-{ id: 10, src: '/music/Debugin Hidup - HMS.mp3', title: 'Debugin Hidup', artist: 'HMS' },
-];
-
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const currentTrack = tracks[currentTrackIndex];
+
+
+  // If tracks are not loaded yet, or currentTrackIndex is out of bounds, use a placeholder
+  const currentTrack = tracks[currentTrackIndex] || { 
+    id: 0, 
+    title: 'Loading...', 
+    artist: '', 
+    filename: '', 
+    src: '' 
+  };
+
+
 
   // Simulate loading delay when changing states
   const handlePlayPause = () => {
-    if (playerState === 'loading') return; // Prevent multiple clicks during loading
-    
+    if (playerState === 'loading' || !currentTrack.src) return; // Prevent multiple clicks during loading or if no src
+
     // Determine the next state based on CURRENT state (before loading)
     const nextState = playerState === 'playing' ? 'paused' : 'playing';
     
@@ -88,13 +135,13 @@ const MusicPlayer = () => {
   // Play/pause audio when playerState changes
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !currentTrack.src) return; // Ensure src is available
     if (playerState === 'playing') {
       audio.play();
     } else if (playerState === 'paused') {
       audio.pause();
     }
-  }, [playerState]);
+  }, [playerState, currentTrack.src]); // Re-run when src changes
 
   // Seek handler
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -127,15 +174,15 @@ const MusicPlayer = () => {
     handleVolume(e);
   };
 
-  const handleVolumeMouseMove = (e: MouseEvent) => {
+  const handleVolumeMouseMove = useCallback((e: MouseEvent) => {
     if (isDraggingVolume) {
       handleVolume(e);
     }
-  };
+  }, [isDraggingVolume]);
 
-  const handleVolumeMouseUp = () => {
+  const handleVolumeMouseUp = useCallback(() => {
     setIsDraggingVolume(false);
-  };
+  }, []);
 
   // Add/remove global mouse event listeners
   useEffect(() => {
@@ -151,6 +198,7 @@ const MusicPlayer = () => {
 
   // Handle next/prev/loop
   const handleNext = useCallback(() => {
+    if (tracks.length === 0) return; // Prevent action if no tracks loaded
     if (playerState === 'playing') {
       setPlayerState('loading');
       setTimeout(() => {
@@ -163,6 +211,7 @@ const MusicPlayer = () => {
   }, [playerState, tracks.length]);
 
   const handlePrev = () => {
+    if (tracks.length === 0) return; // Prevent action if no tracks loaded
     if (playerState === 'playing') {
       setPlayerState('loading');
       setTimeout(() => {
@@ -183,7 +232,7 @@ const MusicPlayer = () => {
   // Auto-advance or loop on track end
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || tracks.length === 0) return; // Ensure audio and tracks are available
     const handleEnded = () => {
       if (loopMode === 'one') {
         audio.currentTime = 0;
@@ -216,7 +265,43 @@ const MusicPlayer = () => {
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [loopMode, shuffle, tracks.length, currentTrackIndex, playerState, handleNext]);
+  }, [loopMode, shuffle, tracks.length, currentTrackIndex, playerState, handleNext, tracks]); // Add tracks to dependency array
+
+  // Track songs played and check for authentication
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const handleEnded = () => {
+      // Increment songs played count
+      setSongsPlayed(prev => prev + 1);
+    };
+    audio.addEventListener('ended', handleEnded);
+    return () => {
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
+  // Check if user needs to login (after 2 songs)
+  useEffect(() => {
+    if (songsPlayed >= 2 && !isAuthenticated) {
+      setShowLoginModal(true);
+    }
+  }, [songsPlayed, isAuthenticated]);
+
+  // Handle dummy login
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    setShowLoginModal(false);
+    localStorage.setItem('musicPlayerAuthenticated', 'true');
+  };
+
+  // Check for existing authentication on mount
+  useEffect(() => {
+    const authenticated = localStorage.getItem('musicPlayerAuthenticated') === 'true';
+    if (authenticated) {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   // Sync audio.muted with state
   useEffect(() => {
@@ -225,11 +310,29 @@ const MusicPlayer = () => {
   }, [muted]);
 
   // Container animation variants
+  // Container animation variants
   const containerVariants: Variants = {
     playing: {
       backgroundColor: '#1a1a1a',
-      boxShadow: '0px 4px 20px rgba(168, 114, 250, 0.5), 0px 10px 40px rgba(168, 114, 250, 0.3), 0px 0px 80px rgba(168, 114, 250, 0.1)',
-      transition: { duration: 0.3, ease: 'easeInOut' }
+      // Animate boxShadow to create a pulsating/breathing effect
+      boxShadow: [
+        // Brighter state (start/end of cycle)
+        '0px 4px 20px rgba(168, 114, 250, 0.5), 0px 10px 40px rgba(168, 114, 250, 0.3), 0px 0px 80px rgba(168, 114, 250, 0.1)', 
+        // Slightly darker/less intense state (middle of cycle)
+        '0px 4px 10px rgba(168, 114, 250, 0.2), 0px 10px 20px rgba(168, 114, 250, 0.1), 0px 0px 40px rgba(168, 114, 250, 0.05)', 
+        // Back to brighter (completes the loop)
+        '0px 4px 20px rgba(168, 114, 250, 0.5), 0px 10px 40px rgba(168, 114, 250, 0.3), 0px 0px 80px rgba(168, 114, 250, 0.1)'  
+      ],
+      transition: {
+        // Specific transition for boxShadow animation
+        boxShadow: {
+          duration: 3, // Duration of one full pulse cycle (e.g., 3 seconds)
+          ease: 'easeInOut', // Smooth start and end
+          repeat: Infinity, // Repeat indefinitely
+          repeatType: 'reverse', // Go back and forth (bright -> dark -> bright)
+        },
+        backgroundColor: { duration: 0.3, ease: 'easeInOut' } // Keep existing transition for background
+      }
     },
     paused: {
       backgroundColor: '#0f0f0f',
@@ -242,7 +345,7 @@ const MusicPlayer = () => {
       transition: { duration: 0.3, ease: 'easeInOut' }
     }
   };
-
+  
   // Album artwork animation variants
   const albumVariants: Variants = {
     playing: {
@@ -340,20 +443,57 @@ const MusicPlayer = () => {
   // When currentTrackIndex changes and playerState is playing, always play the new track
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !currentTrack.src) return; // Ensure src is available
     if (playerState === 'playing') {
       audio.play();
     }
-  }, [currentTrackIndex, playerState]);
+  }, [currentTrackIndex, playerState, currentTrack.src]); // Re-run when src changes
+
+  // On mount, set player to loading until first song is ready
+  useEffect(() => {
+    setPlayerState('loading');
+  }, []);
+
+  // When the first song is ready, set player to paused
+  useEffect(() => {
+    if (!audioRef.current) return;
+    const handleReady = () => {
+      setPlayerState('paused');
+    };
+    const audio = audioRef.current;
+    audio.addEventListener('canplay', handleReady);
+    audio.addEventListener('loadeddata', handleReady);
+    return () => {
+      audio.removeEventListener('canplay', handleReady);
+      audio.removeEventListener('loadeddata', handleReady);
+    };
+  }, [currentTrack.src]);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 relative">
+      {/* Toast at the top center */}
+      {toastMessage && (
+        <div className="fixed left-1/2 z-50 transform -translate-x-1/2" style={{ top: '6vh' }}>
+          <div className="bg-[#18181b] text-white px-3 py-1.5 rounded-md text-xs font-normal"
+            style={{
+              boxShadow: '0 0 8px 2px rgba(139,92,246,0.18), 0 0 0 1px #6d28d9',
+              border: '1px solid #23232b',
+              minWidth: '140px',
+              textAlign: 'center',
+            }}
+          >
+            {toastMessage}
+          </div>
+        </div>
+      )}
       {/* Hidden audio element */}
-      <audio
-        ref={audioRef}
-        src={currentTrack.src}
-        preload="auto"
-      />
+      {currentTrack.src ? (
+        <audio
+          ref={audioRef}
+          src={currentTrack.src}
+          preload="auto"
+        />
+      ) : null}
       <motion.div
         className="relative w-full rounded-2xl"
         style={{
@@ -556,7 +696,7 @@ const MusicPlayer = () => {
                 transition: { type: 'spring', stiffness: 400, damping: 25 }
               }}
               onClick={handlePlayPause}
-              disabled={playerState === 'loading'}
+              disabled={playerState === 'loading' || !currentTrack.src} // Disable if no src
             >
               <AnimatePresence mode="wait">
                 {playerState === 'loading' ? (
@@ -690,6 +830,43 @@ const MusicPlayer = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Login Modal */}
+      <AnimatePresence>
+        {showLoginModal && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            >
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  Login Required
+                </h2>
+                <p className="text-gray-300 mb-6">
+                You&apos;ve listened to 2 songs. Please login to continue enjoying music.
+                </p>
+                <motion.button
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
+                  onClick={handleLogin}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Login
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
