@@ -53,6 +53,24 @@ const MusicPlayer = () => {
   const [tracks, setTracks] = useState<Track[]>([]); // State to hold tracks from JSON
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // All bars have the same max height
+  const barCount = 5;
+  const maxBarHeight = 32; // px
+  const minBarHeight = maxBarHeight * 0.2; // 6.4px
+
+  const volumeBarRef = useRef<HTMLDivElement>(null);
+
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
+  // If tracks are not loaded yet, or currentTrackIndex is out of bounds, use a placeholder
+  const currentTrack = tracks[currentTrackIndex] || { 
+    id: 0, 
+    title: 'Loading...', 
+    artist: '', 
+    filename: '', 
+    src: '' 
+  };
+
   // Fetch tracks from JSON on component mount
   useEffect(() => {
     fetch('/tracks.json') // Assuming tracks.json is in your public directory
@@ -73,39 +91,18 @@ const MusicPlayer = () => {
       .catch(error => console.error("Could not fetch tracks:", error));
   }, []);
 
+  // Toast message on mount (keeping this as requested)
   useEffect(() => {
-    // Show a random toast on mount
     const msg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
     setToastMessage(msg);
     const timer = setTimeout(() => setToastMessage(null), 4000);
     return () => clearTimeout(timer);
   }, []);
 
-  // All bars have the same max height
-  const barCount = 5;
-  const maxBarHeight = 32; // px
-  const minBarHeight = maxBarHeight * 0.2; // 6.4px
-
-  const volumeBarRef = useRef<HTMLDivElement>(null);
-
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-
-
-  // If tracks are not loaded yet, or currentTrackIndex is out of bounds, use a placeholder
-  const currentTrack = tracks[currentTrackIndex] || { 
-    id: 0, 
-    title: 'Loading...', 
-    artist: '', 
-    filename: '', 
-    src: '' 
-  };
-
-
-
   // Simulate loading delay when changing states
   const handlePlayPause = () => {
     if (playerState === 'loading' || !currentTrack.src) return; // Prevent multiple clicks during loading or if no src
-
+    
     // Determine the next state based on CURRENT state (before loading)
     const nextState = playerState === 'playing' ? 'paused' : 'playing';
     
@@ -115,22 +112,25 @@ const MusicPlayer = () => {
     }, 500);
   };
 
-  // Update progress as audio plays
+  // Update progress as audio plays - FIXED: Added proper dependencies
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !currentTrack.src) return;
+    
     const updateProgress = () => {
       setCurrentTime(audio.currentTime || 0);
       setProgress((audio.currentTime / audio.duration) * 100 || 0);
     };
     const setAudioDuration = () => setDuration(audio.duration || 0);
+    
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('loadedmetadata', setAudioDuration);
+    
     return () => {
       audio.removeEventListener('timeupdate', updateProgress);
       audio.removeEventListener('loadedmetadata', setAudioDuration);
     };
-  }, []);
+  }, [currentTrack.src]); // FIXED: Added currentTrack.src as dependency
 
   // Play/pause audio when playerState changes
   useEffect(() => {
@@ -196,7 +196,7 @@ const MusicPlayer = () => {
     }
   }, [isDraggingVolume, handleVolumeMouseMove, handleVolumeMouseUp]);
 
-  // Handle next/prev/loop
+  // Handle next/prev - FIXED: Simplified logic like the original
   const handleNext = useCallback(() => {
     if (tracks.length === 0) return; // Prevent action if no tracks loaded
     if (playerState === 'playing') {
@@ -222,6 +222,7 @@ const MusicPlayer = () => {
       setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
     }
   };
+  
   const handleLoopToggle = () => {
     setLoopMode((prev) => prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off');
   };
@@ -229,11 +230,14 @@ const MusicPlayer = () => {
     setShuffle((prev) => !prev);
   };
 
-  // Auto-advance or loop on track end
+  // Auto-advance or loop on track end - FIXED: Consolidated into single useEffect
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || tracks.length === 0) return; // Ensure audio and tracks are available
+    
     const handleEnded = () => {
+      setSongsPlayed(prev => prev + 1); // Increment songs played count
+      
       if (loopMode === 'one') {
         audio.currentTime = 0;
         audio.play();
@@ -261,32 +265,19 @@ const MusicPlayer = () => {
         }
       }
     };
+    
     audio.addEventListener('ended', handleEnded);
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [loopMode, shuffle, tracks.length, currentTrackIndex, playerState, handleNext, tracks]); // Add tracks to dependency array
+  }, [loopMode, shuffle, tracks.length, currentTrackIndex, handleNext]); // FIXED: Removed duplicate dependencies
 
-  // Track songs played and check for authentication
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const handleEnded = () => {
-      // Increment songs played count
-      setSongsPlayed(prev => prev + 1);
-    };
-    audio.addEventListener('ended', handleEnded);
-    return () => {
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, []);
-
-  // Check if user needs to login (after 2 songs)
-  useEffect(() => {
-    if (songsPlayed >= 2 && !isAuthenticated) {
-      setShowLoginModal(true);
-    }
-  }, [songsPlayed, isAuthenticated]);
+  // Check if user needs to login (after 2 songs) - DISABLED FOR TESTING
+  // useEffect(() => {
+  //   if (songsPlayed >= 2 && !isAuthenticated) {
+  //     setShowLoginModal(true);
+  //   }
+  // }, [songsPlayed, isAuthenticated]);
 
   // Handle dummy login
   const handleLogin = () => {
@@ -309,7 +300,6 @@ const MusicPlayer = () => {
     if (audio) audio.muted = muted;
   }, [muted]);
 
-  // Container animation variants
   // Container animation variants
   const containerVariants: Variants = {
     playing: {
@@ -440,35 +430,6 @@ const MusicPlayer = () => {
     }
   };
 
-  // When currentTrackIndex changes and playerState is playing, always play the new track
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack.src) return; // Ensure src is available
-    if (playerState === 'playing') {
-      audio.play();
-    }
-  }, [currentTrackIndex, playerState, currentTrack.src]); // Re-run when src changes
-
-  // On mount, set player to loading until first song is ready
-  useEffect(() => {
-    setPlayerState('loading');
-  }, []);
-
-  // When the first song is ready, set player to paused
-  useEffect(() => {
-    if (!audioRef.current) return;
-    const handleReady = () => {
-      setPlayerState('paused');
-    };
-    const audio = audioRef.current;
-    audio.addEventListener('canplay', handleReady);
-    audio.addEventListener('loadeddata', handleReady);
-    return () => {
-      audio.removeEventListener('canplay', handleReady);
-      audio.removeEventListener('loadeddata', handleReady);
-    };
-  }, [currentTrack.src]);
-
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 relative">
       {/* Toast at the top center */}
@@ -486,14 +447,13 @@ const MusicPlayer = () => {
           </div>
         </div>
       )}
-      {/* Hidden audio element */}
-      {currentTrack.src ? (
+      {currentTrack.src && (
         <audio
           ref={audioRef}
           src={currentTrack.src}
           preload="auto"
         />
-      ) : null}
+      )}
       <motion.div
         className="relative w-full rounded-2xl"
         style={{
@@ -680,10 +640,10 @@ const MusicPlayer = () => {
 
             {/* Play/Pause Button */}
             <motion.button
-              className="rounded-full flex items-center justify-center border-2 border-transparent transition-colors"
+              className="flex items-center justify-center rounded-full shadow-lg transition-all duration-300"
               style={{
-                width: 'clamp(40px, 8vw, 56px)',
-                height: 'clamp(40px, 8vw, 56px)',
+                width: 'clamp(48px, 12vw, 64px)',
+                height: 'clamp(48px, 12vw, 64px)',
               }}
               variants={playButtonVariants}
               animate={playerState}
@@ -696,7 +656,7 @@ const MusicPlayer = () => {
                 transition: { type: 'spring', stiffness: 400, damping: 25 }
               }}
               onClick={handlePlayPause}
-              disabled={playerState === 'loading' || !currentTrack.src} // Disable if no src
+              disabled={playerState === 'loading'}
             >
               <AnimatePresence mode="wait">
                 {playerState === 'loading' ? (
@@ -852,7 +812,7 @@ const MusicPlayer = () => {
                   Login Required
                 </h2>
                 <p className="text-gray-300 mb-6">
-                You&apos;ve listened to 2 songs. Please login to continue enjoying music.
+                  You&apos;ve listened to 2 songs. Please login to continue enjoying music.
                 </p>
                 <motion.button
                   className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
