@@ -47,9 +47,9 @@ const MusicPlayer = () => {
   const [shuffle, setShuffle] = useState(false);
   const [muted, setMuted] = useState(false);
   const [isDraggingVolume, setIsDraggingVolume] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [songsPlayed, setSongsPlayed] = useState(0);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false); // DISABLED FOR TESTING
+  // const [showLoginModal, setShowLoginModal] = useState(false); // DISABLED FOR TESTING
+  // const [songsPlayed, setSongsPlayed] = useState(0); // DISABLED FOR TESTING
   const [tracks, setTracks] = useState<Track[]>([]); // State to hold tracks from JSON
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -235,8 +235,8 @@ const MusicPlayer = () => {
     const audio = audioRef.current;
     if (!audio || tracks.length === 0) return; // Ensure audio and tracks are available
     
-    const handleEnded = () => {
-      setSongsPlayed(prev => prev + 1); // Increment songs played count
+          const handleEnded = () => {
+        // setSongsPlayed(prev => prev + 1); // Increment songs played count - DISABLED FOR TESTING
       
       if (loopMode === 'one') {
         audio.currentTime = 0;
@@ -279,20 +279,20 @@ const MusicPlayer = () => {
   //   }
   // }, [songsPlayed, isAuthenticated]);
 
-  // Handle dummy login
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    setShowLoginModal(false);
-    localStorage.setItem('musicPlayerAuthenticated', 'true');
-  };
+  // Handle dummy login - DISABLED FOR TESTING
+  // const handleLogin = () => {
+  //   setIsAuthenticated(true);
+  //   setShowLoginModal(false);
+  //   localStorage.setItem('musicPlayerAuthenticated', 'true');
+  // };
 
-  // Check for existing authentication on mount
-  useEffect(() => {
-    const authenticated = localStorage.getItem('musicPlayerAuthenticated') === 'true';
-    if (authenticated) {
-      setIsAuthenticated(true);
-    }
-  }, []);
+  // Check for existing authentication on mount - DISABLED FOR TESTING
+  // useEffect(() => {
+  //   const authenticated = localStorage.getItem('musicPlayerAuthenticated') === 'true';
+  //   if (authenticated) {
+  //     setIsAuthenticated(true);
+  //   }
+  // }, []);
 
   // Sync audio.muted with state
   useEffect(() => {
@@ -791,8 +791,8 @@ const MusicPlayer = () => {
         </div>
       </motion.div>
 
-      {/* Login Modal */}
-      <AnimatePresence>
+      {/* Login Modal - DISABLED FOR TESTING */}
+      {/* <AnimatePresence>
         {showLoginModal && (
           <motion.div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -826,7 +826,7 @@ const MusicPlayer = () => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </div>
   );
 };
