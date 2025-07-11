@@ -71,6 +71,9 @@ const MusicPlayer = () => {
     src: '' 
   };
 
+  // Track the latest requested track index for robust loading
+  const latestTrackRequest = useRef(0);
+
   // Fetch tracks from JSON on component mount
   useEffect(() => {
     fetch('/tracks.json') // Assuming tracks.json is in your public directory
@@ -99,17 +102,15 @@ const MusicPlayer = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Simulate loading delay when changing states
+  // Play/pause with robust loading logic
   const handlePlayPause = () => {
-    if (playerState === 'loading' || !currentTrack.src) return; // Prevent multiple clicks during loading or if no src
-    
-    // Determine the next state based on CURRENT state (before loading)
-    const nextState = playerState === 'playing' ? 'paused' : 'playing';
-    
-    setPlayerState('loading');
-    setTimeout(() => {
-      setPlayerState(nextState);
-    }, 500);
+    if (playerState === 'loading' || !currentTrack.src) return;
+    if (playerState === 'playing') {
+      setPlayerState('paused');
+    } else {
+      setPlayerState('loading');
+      latestTrackRequest.current = currentTrackIndex;
+    }
   };
 
   // Update progress as audio plays - FIXED: Added proper dependencies
@@ -196,31 +197,25 @@ const MusicPlayer = () => {
     }
   }, [isDraggingVolume, handleVolumeMouseMove, handleVolumeMouseUp]);
 
-  // Handle next/prev - FIXED: Simplified logic like the original
+  // Handle next/prev with robust loading logic
   const handleNext = useCallback(() => {
-    if (tracks.length === 0) return; // Prevent action if no tracks loaded
-    if (playerState === 'playing') {
-      setPlayerState('loading');
-      setTimeout(() => {
-        setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
-        setPlayerState('playing');
-      }, 500);
-    } else {
-      setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
-    }
-  }, [playerState, tracks.length]);
+    if (tracks.length === 0) return;
+    setPlayerState('loading');
+    setCurrentTrackIndex((prev) => {
+      const nextIndex = (prev + 1) % tracks.length;
+      latestTrackRequest.current = nextIndex;
+      return nextIndex;
+    });
+  }, [tracks.length]);
 
   const handlePrev = () => {
-    if (tracks.length === 0) return; // Prevent action if no tracks loaded
-    if (playerState === 'playing') {
-      setPlayerState('loading');
-      setTimeout(() => {
-        setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
-        setPlayerState('playing');
-      }, 500);
-    } else {
-      setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
-    }
+    if (tracks.length === 0) return;
+    setPlayerState('loading');
+    setCurrentTrackIndex((prev) => {
+      const prevIndex = (prev - 1 + tracks.length) % tracks.length;
+      latestTrackRequest.current = prevIndex;
+      return prevIndex;
+    });
   };
   
   const handleLoopToggle = () => {
@@ -271,6 +266,32 @@ const MusicPlayer = () => {
       audio.removeEventListener('ended', handleEnded);
     };
   }, [loopMode, shuffle, tracks.length, currentTrackIndex, handleNext]); // FIXED: Removed duplicate dependencies
+
+  // Only play when canplay and latest request matches
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentTrack.src) return;
+
+    const handleCanPlay = () => {
+      if (playerState === 'loading' && latestTrackRequest.current === currentTrackIndex) {
+        setPlayerState('playing');
+        audio.play();
+      }
+    };
+    audio.addEventListener('canplay', handleCanPlay);
+    return () => {
+      audio.removeEventListener('canplay', handleCanPlay);
+    };
+  }, [currentTrack.src, playerState, currentTrackIndex]);
+
+  // When track changes, set to loading if we were playing
+  useEffect(() => {
+    if (playerState === 'playing') {
+      setPlayerState('loading');
+      latestTrackRequest.current = currentTrackIndex;
+    }
+    // eslint-disable-next-line
+  }, [currentTrackIndex]);
 
   // Check if user needs to login (after 2 songs) - DISABLED FOR TESTING
   // useEffect(() => {
