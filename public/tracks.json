@@ -1,92 +1,62 @@
 [
-    { 
-      "id": 1, 
-      "title": "Tersirat di Balik Senyuman", 
-      "artist": "Brunetta Gondola",
-      "filename": "Tersirat di Balik Senyuman - Brunetta Gondola.mp3"
-    },
-    { 
-      "id": 2, 
-      "title": "ポモドーロ・ラブ - 真道もも (Pomodoro LOVE! - Mado Momo)", 
-      "artist": "真道もも (Mado Momo)",
-      "filename": "ポモドーロ・ラブ - 真道もも (Pomodoro LOVE! - Mado Momo) - HMS.mp3"
-    },
-    { 
-      "id": 3, 
-      "title": "Possesive Cyborg Maid", 
-      "artist": "HMS",
-      "filename": "Possesive Cyborg Maid - HMS.mp3"
-    },
-    { 
-      "id": 4, 
-      "title": "Nur Wenn Ich Will (AI-Prinz)", 
-      "artist": "HMS",
-      "filename": "„Nur Wenn Ich Will (AI-Prinz)\" - HMS.mp3"
-    },
-    { 
-      "id": 5, 
-      "title": "🔥 _I Am the Dream Dreaming Me_", 
-      "artist": "HMS",
-      "filename": "🔥 _I Am the Dream Dreaming Me_ - HMS.mp3"
-    },
-    { 
-      "id": 6, 
-      "title": "「冬の神話 (Fuyu no Shinwa) — Winter Myth」", 
-      "artist": "HMS",
-      "filename": "「冬の神話 (Fuyu no Shinwa) — Winter Myth」 - HMS.mp3"
-    },
-    { 
-      "id": 7, 
-      "title": "A Morning Hum", 
-      "artist": "HMS",
-      "filename": "A Morning Hum - HMS.mp3"
-    },
-    { 
-      "id": 8, 
-      "title": "🌸 花の香りに (Hana no Kaori ni) 🌸 Glam Rock Live", 
-      "artist": "差乃間・ミッチ",
-      "filename": "🌸 花の香りに (Hana no Kaori ni) 🌸 Glam Rock Live - 差乃間・ミッチ.mp3"
-    },
-    { 
-      "id": 9, 
-      "title": "A Morning Hum (Remix)", 
-      "artist": "HMS",
-      "filename": "A Morning Hum (Remix) - HMS.mp3"
-    },
-    { 
-      "id": 10, 
-      "title": "🌸 花の香りに (Hana no Kaori ni) 🌸", 
-      "artist": "花野かおり",
-      "filename": "🌸 花の香りに (Hana no Kaori ni) 🌸 - 花野かおり.mp3"
-    },
-    { 
-      "id": 11, 
-      "title": "Debugin Hidup", 
-      "artist": "HMS",
-      "filename": "Debugin Hidup - HMS.mp3"
-    },
-    { 
-      "id": 12, 
-      "title": "Petals of Youth Memories", 
-      "artist": "HMS",
-      "filename": "Petals of Youth Memories - HMS.mp3"
-    },
-    { 
-      "id": 13, 
-      "title": "Sangkan Paraning Dumadisko", 
-      "artist": "HMS",
-      "filename": "Sangkan Paraning Dumadisko - HMS.mp3"
-    },
-    { 
-      "id": 14, 
-      "title": "Zbrrr! Patatra", 
-      "artist": "HMS",
-      "filename": "Zbrrr! Patatra - HMS.mp3"
-    },
-    { 
-      "id": 15, 
-      "title": "Possesive Cyborg Maid (Distort Break Cover)", 
-      "artist": "HMS",
-      "filename": "Possesive Cyborg Maid (Distort Break Cover) - HMS.mp3"
-    }
-  ]
+  {
+    "id": 1,
+    "title": "Blowing Wind Sonata - HMS",
+    "artist": "hmsmakesong",
+    "filename": "Blowing Wind Sonata - HMS_medium.mp3"
+  },
+  {
+    "id": 2,
+    "title": "Fluuuuute - HMS",
+    "artist": "hmsmakesong",
+    "filename": "Fluuuuute - HMS_medium.mp3"
+  },
+  {
+    "id": 3,
+    "title": "Golden Honey Afterglow (Disco Remix) - HMS",
+    "artist": "hmsmakesong",
+    "filename": "Golden Honey Afterglow (Disco Remix) - HMS_medium.mp3"
+  },
+  {
+    "id": 4,
+    "title": "Golden Honey Afterglow -HMS",
+    "artist": "hmsmakesong",
+    "filename": "Golden Honey Afterglow -HMS_medium.mp3"
+  },
+  {
+    "id": 5,
+    "title": "liquid miaow - HMS",
+    "artist": "hmsmakesong",
+    "filename": "liquid miaow - HMS_medium.mp3"
+  },
+  {
+    "id": 6,
+    "title": "Lofi - abandoned radio station - HMS",
+    "artist": "hmsmakesong",
+    "filename": "Lofi - abandoned radio station - HMS_medium.mp3"
+  },
+  {
+    "id": 7,
+    "title": "Miaow Funny Band - HMS",
+    "artist": "hmsmakesong",
+    "filename": "Miaow Funny Band - HMS_medium.mp3"
+  },
+  {
+    "id": 8,
+    "title": "the tunic - HMS",
+    "artist": "hmsmakesong",
+    "filename": "the tunic - HMS_medium.mp3"
+  },
+  {
+    "id": 9,
+    "title": "Vast and Open - HMS",
+    "artist": "hmsmakesong",
+    "filename": "Vast and Open - HMS_medium.mp3"
+  },
+  {
+    "id": 10,
+    "title": "\"VENOM CODE\" - HMS",
+    "artist": "hmsmakesong",
+    "filename": "%E2%80%9CVENOM%20CODE%E2%80%9D%20-%20HMS_medium.mp3"
+  }
+]
