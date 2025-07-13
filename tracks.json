@@ -1,6 +1,6 @@
 {
   "totalTracks": 10,
-  "generatedAt": "2025-07-12T17:47:06.200Z",
+  "generatedAt": "2025-07-13T05:01:37.833Z",
   "tracks": [
     {
       "id": 1,
@@ -12,10 +12,11 @@
       "filename": "Blowing Wind Sonata - HMS",
       "coverArt": "Blowing Wind Sonata - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/Blowing Wind Sonata - HMS_low.mp3",
-        "medium": "./output_converted/Blowing Wind Sonata - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Blowing%20Wind%20Sonata%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Blowing%20Wind%20Sonata%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Blowing%20Wind%20Sonata%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 2,
@@ -27,10 +28,11 @@
       "filename": "Fluuuuute - HMS",
       "coverArt": "Fluuuuute - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/Fluuuuute - HMS_low.mp3",
-        "medium": "./output_converted/Fluuuuute - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Fluuuuute%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Fluuuuute%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Fluuuuute%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 3,
@@ -42,10 +44,11 @@
       "filename": "Golden Honey Afterglow (Disco Remix) - HMS",
       "coverArt": "Golden Honey Afterglow (Disco Remix) - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/Golden Honey Afterglow (Disco Remix) - HMS_low.mp3",
-        "medium": "./output_converted/Golden Honey Afterglow (Disco Remix) - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Golden%20Honey%20Afterglow%20%28Disco%20Remix%29%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Golden%20Honey%20Afterglow%20%28Disco%20Remix%29%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Golden%20Honey%20Afterglow%20%28Disco%20Remix%29%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 4,
@@ -57,10 +60,11 @@
       "filename": "Golden Honey Afterglow -HMS",
       "coverArt": "Golden Honey Afterglow -HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/Golden Honey Afterglow -HMS_low.mp3",
-        "medium": "./output_converted/Golden Honey Afterglow -HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Golden%20Honey%20Afterglow%20-HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Golden%20Honey%20Afterglow%20-HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Golden%20Honey%20Afterglow%20-HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 5,
@@ -72,10 +76,11 @@
       "filename": "liquid miaow - HMS",
       "coverArt": "liquid miaow - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/liquid miaow - HMS_low.mp3",
-        "medium": "./output_converted/liquid miaow - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/liquid%20miaow%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/liquid%20miaow%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/liquid%20miaow%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 6,
@@ -87,10 +92,11 @@
       "filename": "Lofi - abandoned radio station - HMS",
       "coverArt": "Lofi - abandoned radio station - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/Lofi - abandoned radio station - HMS_low.mp3",
-        "medium": "./output_converted/Lofi - abandoned radio station - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Lofi%20-%20abandoned%20radio%20station%20-%20HMS_low.mp3",
+        "medium": "https://e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/musicplayer11/Lofi%20-%20abandoned%20radio%20station%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/musicplayer11/Lofi%20-%20abandoned%20radio%20station%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 7,
@@ -102,10 +108,11 @@
       "filename": "Miaow Funny Band - HMS",
       "coverArt": "Miaow Funny Band - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/Miaow Funny Band - HMS_low.mp3",
-        "medium": "./output_converted/Miaow Funny Band - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Miaow%20Funny%20Band%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Miaow%20Funny%20Band%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Miaow%20Funny%20Band%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 8,
@@ -117,10 +124,11 @@
       "filename": "the tunic - HMS",
       "coverArt": "the tunic - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/the tunic - HMS_low.mp3",
-        "medium": "./output_converted/the tunic - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/the%20tunic%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/the%20tunic%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/the%20tunic%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 9,
@@ -132,10 +140,11 @@
       "filename": "Vast and Open - HMS",
       "coverArt": "Vast and Open - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/Vast and Open - HMS_low.mp3",
-        "medium": "./output_converted/Vast and Open - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Vast%20and%20Open%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Vast%20and%20Open%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/Vast%20and%20Open%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     },
     {
       "id": 10,
@@ -147,10 +156,11 @@
       "filename": "“VENOM CODE” - HMS",
       "coverArt": "“VENOM CODE” - HMS_cover.jpg",
       "qualities": {
-        "low": "./output_converted/“VENOM CODE” - HMS_low.mp3",
-        "medium": "./output_converted/“VENOM CODE” - HMS_medium.mp3"
+        "low": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/%E2%80%9CVENOM%20CODE%E2%80%9D%20-%20HMS_low.mp3",
+        "medium": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/%E2%80%9CVENOM%20CODE%E2%80%9D%20-%20HMS_medium.mp3"
       },
-      "uploadedAt": "2025-07-12T17:47:06.200Z"
+      "streamUrl": "https://musicplayer11.e389992f85db84ed4a3e986aeaab73eb.r2.cloudflarestorage.com/%E2%80%9CVENOM%20CODE%E2%80%9D%20-%20HMS_medium.mp3",
+      "uploadedAt": "2025-07-13T05:01:37.833Z"
     }
   ]
 }

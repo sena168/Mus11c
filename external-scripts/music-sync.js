@@ -11,14 +11,14 @@ const AWS = require('aws-sdk');
 const mm = require('music-metadata'); // music-metadata for extracting tags
 const chalk = require('chalk');
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 // --- Config ---
 const CONFIG = {
-  inputDir: './music_to_sync',           // Where you put your music
-  outputDir: './output_converted',       // Where converted files go
-  coverArtDir: './cover_art',            // Where extracted cover art goes
-  tracksJson: './tracks.json',           // Output config for your player
+  inputDir: '../music_to_sync',           // Where you put your music
+  outputDir: '../output_converted',       // Where converted files go
+  coverArtDir: '../cover_art',            // Where extracted cover art goes
+  tracksJson: '../tracks.json',           // Output config for your player
   cloudflare: {
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY_ID,
@@ -151,13 +151,35 @@ function convertAudio(inputFile, outputBaseName) {
 
 // Upload file to Cloudflare R2
 async function uploadToR2(filePath, fileName) {
-  // Skip upload for testing - return local file path instead
-  console.log(chalk.blue(`   📤 Skipping upload (test mode): ${fileName}`));
-  return {
-    success: true,
-    url: `./output_converted/${fileName}`, // Local path for testing
-    size: (fs.statSync(filePath).size / (1024 * 1024)).toFixed(2)
-  };
+  try {
+    const fileContent = fs.readFileSync(filePath);
+    const contentType = getContentType(fileName);
+    
+    const uploadParams = {
+      Bucket: CONFIG.cloudflare.bucketName,
+      Key: fileName,
+      Body: fileContent,
+      ContentType: contentType,
+      ACL: 'public-read'
+    };
+    
+    console.log(chalk.blue(`   📤 Uploading: ${fileName}`));
+    const result = await s3.upload(uploadParams).promise();
+    
+    const sizeInMB = (fs.statSync(filePath).size / (1024 * 1024)).toFixed(2);
+    
+    return {
+      success: true,
+      url: result.Location,
+      size: sizeInMB
+    };
+  } catch (error) {
+    console.log(chalk.red(`   ❌ Upload failed for ${fileName}: ${error.message}`));
+    return {
+      success: false,
+      error: error.message
+    };
+  }
 }
 
 // Get content type for file
@@ -195,23 +217,28 @@ async function fileExistsInR2(fileName) {
 
 // Generate tracks.json
 function generateTracksJson(tracks) {
-  const tracksData = tracks.map((track, index) => ({
-    id: index + 1,
-    title: track.title,
-    artist: track.artist,
-    album: track.album,
-    genre: track.genre,
-    year: track.year,
-    track: track.track,
-    filename: track.filename,
-    coverArt: track.coverArtFileName,
-    qualities: {
-      low: track.qualities.low?.url,
-      medium: track.qualities.medium?.url,
-      high: track.qualities.high?.url
-    },
-    uploadedAt: new Date().toISOString()
-  }));
+  const tracksData = tracks.map((track, index) => {
+    // Pick the best available stream URL: medium > low > high
+    let streamUrl = track.qualities.medium?.url || track.qualities.low?.url || track.qualities.high?.url || null;
+    return {
+      id: index + 1,
+      title: track.title,
+      artist: track.artist,
+      album: track.album,
+      genre: track.genre,
+      year: track.year,
+      track: track.track,
+      filename: track.filename,
+      coverArt: track.coverArtFileName,
+      qualities: {
+        low: track.qualities.low?.url,
+        medium: track.qualities.medium?.url,
+        high: track.qualities.high?.url
+      },
+      streamUrl, // <-- Add this field
+      uploadedAt: new Date().toISOString()
+    };
+  });
   
   const tracksJson = {
     totalTracks: tracks.length,
