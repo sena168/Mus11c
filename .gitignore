@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# music for streaming
+external-scripts\music_to_sync
+music_content/

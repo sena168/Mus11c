@@ -15,9 +15,9 @@ dotenv.config({ path: '../.env' });
 
 // --- Config ---
 const CONFIG = {
-  inputDir: '../music_to_sync',           // Where you put your music
-  outputDir: '../output_converted',       // Where converted files go
-  coverArtDir: '../cover_art',            // Where extracted cover art goes
+  inputDir: '../music_content/music_to_sync',           // Where you put your music
+  outputDir: '../music_content/output_converted',       // Where converted files go
+  coverArtDir: '../music_content/cover_art',            // Where extracted cover art goes
   tracksJson: '../tracks.json',           // Output config for your player
   cloudflare: {
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
