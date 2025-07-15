@@ -52,6 +52,7 @@ const MusicPlayer = () => {
   // const [songsPlayed, setSongsPlayed] = useState(0); // DISABLED FOR TESTING
   const [tracks, setTracks] = useState<Track[]>([]); // State to hold tracks from JSON
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // All bars have the same max height
   const barCount = 5;
@@ -100,6 +101,21 @@ const MusicPlayer = () => {
     const timer = setTimeout(() => setToastMessage(null), 4000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showDropdown && !target.closest('.album-art-dropdown')) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showDropdown]);
 
   // Play/pause with robust loading logic
   const handlePlayPause = () => {
@@ -222,6 +238,17 @@ const MusicPlayer = () => {
   };
   const handleShuffleToggle = () => {
     setShuffle((prev) => !prev);
+  };
+
+  // Dropdown menu handlers
+  const handleAlbumArtClick = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleChangeTheme = () => {
+    // TODO: Implement theme change functionality
+    console.log('Change theme clicked');
+    setShowDropdown(false);
   };
 
   // Auto-advance or loop on track end - FIXED: Consolidated into single useEffect
@@ -490,33 +517,85 @@ const MusicPlayer = () => {
           <div className="flex flex-col" style={{ paddingBottom: 'clamp(8px, 2vw, 24px)' }}>
             {/* Album Art + Song Details Row */}
             <div className="flex items-center" style={{ gap: 'clamp(8px, 4vw, 32px)' }}>
-              {/* Album Artwork */}
-              <motion.div
-                className="relative flex-shrink-0 overflow-hidden rounded-xl"
-                style={{
-                  width: 'clamp(56px, 24vw, 120px)',
-                  height: 'clamp(56px, 24vw, 120px)',
-                  background: 'linear-gradient(127.48deg, #7c3aed, #db2777)'
-                }}
-                variants={albumVariants}
-                animate={playerState}
-              >
-                <Image
-                  src="/AlbumArt.png"
-                  alt="Album Art"
+              {/* Album Artwork with Dropdown */}
+              <div className="relative album-art-dropdown">
+                <motion.div
+                  className="relative flex-shrink-0 overflow-hidden rounded-xl cursor-pointer"
                   style={{
-                    position: 'absolute',
-                    top: '25%',
-                    left: '30%',
-                    width: '40%',
-                    height: '40%',
-                    objectFit: 'contain'
+                    width: 'clamp(56px, 24vw, 120px)',
+                    height: 'clamp(56px, 24vw, 120px)',
+                    background: 'linear-gradient(127.48deg, #7c3aed, #db2777)'
                   }}
-                  width={48}
-                  height={48}
-                  priority
-                />
-              </motion.div>
+                  variants={albumVariants}
+                  animate={playerState}
+                  onClick={handleAlbumArtClick}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Image
+                    src="/AlbumArt.png"
+                    alt="Album Art"
+                    style={{
+                      position: 'absolute',
+                      top: '25%',
+                      left: '30%',
+                      width: '40%',
+                      height: '40%',
+                      objectFit: 'contain'
+                    }}
+                    width={48}
+                    height={48}
+                    priority
+                  />
+                </motion.div>
+                
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {showDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-0 right-full mr-32 z-50"
+                      style={{
+                        minWidth: '200px',
+                        backgroundColor: '#0f0f0f',
+                        border: '1px solid #23232b',
+                        borderRadius: '8px',
+                        boxShadow: playerState === 'playing' 
+                          ? '0px 2px 10px rgba(168, 114, 250, 0.3), 0px 4px 20px rgba(168, 114, 250, 0.2), 0px 0px 30px rgba(168, 114, 250, 0.05)'
+                          : '0px 4px 20px rgba(0, 0, 0, 0.6), 0px 10px 40px rgba(0, 0, 0, 0.4)'
+                      }}
+                    >
+                      <div className="py-1">
+                        <button
+                          onClick={handleChangeTheme}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-800 transition-colors"
+                          style={{ color: '#f5f5f5' }}
+                        >
+                          change theme
+                        </button>
+                        <div className="px-4 py-1 text-sm" style={{ color: '#a4a7ae' }}>
+                          about
+                        </div>
+                        <div className="px-4 py-1 text-sm" style={{ color: '#a4a7ae' }}>
+                          change album
+                        </div>
+                        <div className="px-4 py-1 text-sm" style={{ color: '#a4a7ae' }}>
+                          upload music
+                        </div>
+                        <div className="px-4 py-1 text-sm" style={{ color: '#a4a7ae' }}>
+                          buy me a coffee
+                        </div>
+                        <div className="px-4 py-1 text-sm" style={{ color: '#a4a7ae' }}>
+                          log in
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               {/* Right side - Song Details */}
               <div className="flex-1 flex flex-col justify-start">
                 <div className="flex flex-col" style={{ gap: '4px' }}>

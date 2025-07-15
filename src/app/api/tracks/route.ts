@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import AWS from 'aws-sdk';
 
 // Configure AWS SDK for Cloudflare R2
@@ -10,7 +10,7 @@ const s3 = new AWS.S3({
   signatureVersion: 'v4'
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // List all objects in the bucket
     const listObjectsParams = {

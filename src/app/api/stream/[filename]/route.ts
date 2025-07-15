@@ -45,7 +45,7 @@ export async function GET(
     };
 
     // Create response with proper headers for streaming
-    const response = new NextResponse(object.Body as any);
+    const response = new NextResponse(object.Body as unknown as BodyInit);
     
     response.headers.set('Content-Type', getContentType(decodedFilename));
     response.headers.set('Content-Length', object.ContentLength?.toString() || '0');
