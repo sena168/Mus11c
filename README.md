@@ -137,6 +137,21 @@ The core music player with smooth animations and basic functionality is complete
 - **Audio Processing**: FFmpeg, music-metadata
 - **Icons**: Lucide React
 
+## 🤖 **IMPORTANT NOTE FOR AI ASSISTANTS**
+
+**Environment Variables Workflow**: This project uses a specific workflow for managing environment variables:
+- `env.txt` contains the source environment variables (visible to AI assistants)
+- `.env` contains the actual environment variables used by the app (not visible to AI assistants)
+- **ALWAYS run `node external-scripts/sync-env.js` after updating `env.txt`** to sync changes to `.env`
+- This ensures the app uses the latest credentials while keeping them secure
+
+**When updating environment variables:**
+1. Update `env.txt` with new credentials
+2. Run: `node external-scripts/sync-env.js`
+3. The app will automatically use the updated `.env` file
+
+---
+
 ## 🚀 Getting Started
 
 1. **Install Dependencies**
@@ -147,6 +162,7 @@ The core music player with smooth animations and basic functionality is complete
 2. **Set Up Environment**
    - Copy `env.txt` to `.env.local`
    - Configure Cloudflare R2 credentials
+   - **Run**: `node external-scripts/sync-env.js` to sync to `.env`
 
 3. **Add Music Content**
    - Place music files in `music_content/music_to_sync/`
