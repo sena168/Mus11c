@@ -147,8 +147,15 @@ The core music player with smooth animations and basic functionality is complete
 
 **When updating environment variables:**
 1. Update `env.txt` with new credentials
-2. Run: `node external-scripts/sync-env.js`
+2. Run: `node external-scripts/sync-env.js` (or double-click `sync-env.bat` on Windows)
 3. The app will automatically use the updated `.env` file
+
+**Testing Guidelines for AI Assistants:**
+- ✅ **SAFE**: Create test files in `test-scripts/` directory (gitignored)
+- ❌ **UNSAFE**: Creating test files in root directory
+- ✅ **SAFE**: Use `node test-scripts/your-test.js` to run tests
+- ✅ **SAFE**: Test files can read from `env.txt` or `.env`
+- 🔒 **SECURITY**: `test-scripts/` is in `.gitignore` - secrets stay local
 
 ---
 

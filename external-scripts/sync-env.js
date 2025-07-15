@@ -10,7 +10,7 @@ function syncEnvFile() {
     // Check if env.txt exists
     if (!fs.existsSync(envTxtPath)) {
       console.log('⚠️  env.txt not found. Skipping sync.');
-      return;
+      process.exit(0);
     }
 
     // Read env.txt content
@@ -33,7 +33,11 @@ function syncEnvFile() {
     
   } catch (error) {
     console.error('❌ Error syncing env files:', error.message);
+    process.exit(1);
   }
+  
+  // Always exit cleanly
+  process.exit(0);
 }
 
 // Run the sync

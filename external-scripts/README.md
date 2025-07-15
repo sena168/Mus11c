@@ -11,6 +11,7 @@ This directory contains utility scripts for the Mus11c Player project.
 ```bash
 node external-scripts/sync-env.js
 ```
+**Windows**: Double-click `sync-env.bat` in the project root
 
 **What it does**:
 - Reads `env.txt` from the project root
