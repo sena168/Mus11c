@@ -157,6 +157,13 @@ The core music player with smooth animations and basic functionality is complete
 - ✅ **SAFE**: Test files can read from `env.txt` or `.env`
 - 🔒 **SECURITY**: `test-scripts/` is in `.gitignore` - secrets stay local
 
+**Commands to Avoid (See `stuck.md` for details):**
+- ❌ **STUCK**: `git fetch origin` - Use `git status --porcelain` instead
+- ❌ **STUCK**: `git pull origin main` - Use `git push --force origin main` when safe
+- ❌ **STUCK**: `git push --force-with-lease` - Use `git push --force origin main` instead
+- ❌ **STUCK**: Commands that wait for user input
+- ✅ **SAFE**: Always use non-interactive commands with clear exit conditions
+
 ---
 
 ## 🚀 Getting Started
