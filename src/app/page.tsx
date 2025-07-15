@@ -74,30 +74,29 @@ const MusicPlayer = () => {
   // Track the latest requested track index for robust loading
   const latestTrackRequest = useRef(0);
 
-  // Fetch tracks from JSON on component mount
+  // Fetch tracks from R2 API
   useEffect(() => {
-    fetch('/tracks.json') // Assuming tracks.json is in your public directory
+    fetch('/api/tracks')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then((data: Omit<Track, 'src'>[]) => {
-        // Construct the src URL using the custom domain
-        const loadedTracks = data.map(track => ({
-          ...track,
-          src: `https://music.kandelagyth.website/${encodeURIComponent(track.filename)}`
-        }));
-        setTracks(loadedTracks);
+      .then((data: { tracks: Track[] }) => {
+        setTracks(data.tracks);
       })
-      .catch(error => console.error("Could not fetch tracks:", error));
+      .catch(error => {
+        console.error('Could not fetch tracks:', error);
+        // Fallback to empty tracks array
+        setTracks([]);
+      });
   }, []);
 
   // Toast message on mount (keeping this as requested)
-  useEffect(() => {
+  useEffect(() => { 
     const msg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-    setToastMessage(msg);
+    setToastMessage(msg); 
     const timer = setTimeout(() => setToastMessage(null), 4000);
     return () => clearTimeout(timer);
   }, []);
